@@ -1,7 +1,7 @@
--- This file is a part of the currency convert module of the Python SDK
+-- currency_convert Vertica Python UDx example
 
 -- Create the User Defined Scalar Function (UDSF)
-CREATE OR REPLACE LIBRARY pylib AS '/home/cstarnes/python_udx/working_examples/currency_conversion/currency_convert.py' LANGUAGE 'Python';
+CREATE OR REPLACE LIBRARY pylib AS '/UDx-Examples/currency_conversion/currency_convert.py' LANGUAGE 'Python';
 CREATE OR REPLACE FUNCTION currency_convert AS LANGUAGE 'Python' NAME 'currency_convert_factory' LIBRARY pylib fenced;
 
 -- Create the table and load the data

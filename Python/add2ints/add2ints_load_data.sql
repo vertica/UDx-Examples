@@ -1,7 +1,7 @@
--- This file is a part of the currency convert module of the Python SDK
+-- add2ints Vertica Python UDx example
 
 -- Create the User Defined Scalar Function (UDSF)
-CREATE OR REPLACE LIBRARY pylib AS '/home/cstarnes/python_udx/working_examples/add2ints/add2ints.py' LANGUAGE 'Python';
+CREATE OR REPLACE LIBRARY pylib AS '/UDx-Examples/Python/add2ints/add2ints.py' LANGUAGE 'Python';
 CREATE OR REPLACE FUNCTION add2ints AS LANGUAGE 'Python' NAME 'add2ints_factory' LIBRARY pylib fenced;
 
 -- Create the table and load the data

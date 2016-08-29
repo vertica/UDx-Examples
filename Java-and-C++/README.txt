@@ -1,9 +1,9 @@
 ****************************
-* HP Vertica Analytics Platform
+* HPE Vertica Analytics Platform
 *
 * User Defined Extensions Examples
 *
-* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP 
+* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP 
 ****************************
 
 This directory contains example code for use with Vertica User Defined Extensions (UDx),
