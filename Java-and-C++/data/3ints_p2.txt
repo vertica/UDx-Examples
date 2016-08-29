@@ -1,0 +1,3 @@
+col1:vint,col2:vint,col3:vint
+3,6,2
+3,7,2
