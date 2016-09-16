@@ -9,7 +9,7 @@ rates2USD = {'USD': 1.000,
              'CAD': 1.30335,
              'ZAR': 15.7181}
 
-class currency_convert(vertica_sdk.ScalarFunctionFactory):
+class currency_convert(vertica_sdk.ScalarFunction):
     """Converts a money column to another currency
     
     Returns a value in USD.
