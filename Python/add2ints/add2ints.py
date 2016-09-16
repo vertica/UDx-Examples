@@ -1,6 +1,6 @@
 import vertica_sdk
 
-class add2ints(vertica_sdk.ScalarFunctionFactory):
+class add2ints(vertica_sdk.ScalarFunction):
     """Return the sum of two integer columns"""
 
     def __init__(self):
