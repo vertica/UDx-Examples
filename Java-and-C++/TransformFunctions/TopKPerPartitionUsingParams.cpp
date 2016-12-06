@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 /* 
  * Description: Example User Defined Transform Function: Output top-k rows in each partition
  *
@@ -8,7 +8,6 @@
 #include <sstream>
 
 using namespace Vertica;
-using namespace std;
 
 class TopKPerPartitionParams : public TransformFunction
 {
@@ -38,7 +37,7 @@ class TopKPerPartitionParams : public TransformFunction
                 outputWriter.next();
                 cnt++;
             } while (inputReader.next());
-        } catch(exception& e) {
+        } catch(std::exception& e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while processing partition: [%s]", e.what());
         }

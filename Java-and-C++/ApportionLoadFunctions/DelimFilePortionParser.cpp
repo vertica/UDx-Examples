@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 
 #include "Vertica.h"
 #include "ContinuousUDParser.h"
@@ -10,7 +10,6 @@ using namespace Vertica;
 #include <vector>
 #include <sstream>
 #include <iostream>
-using namespace std;
 
 
 /**
@@ -310,7 +309,7 @@ public:
             // Typically involves writing it to our StreamWriter,
             // in which case we have to know the input column number.
             if (!handleField(col, (char*)cr.getDataPtr() + currentColPosition, currentColSize, !cr.isEof())) {
-                stringstream ss;
+                std::stringstream ss;
                 ss<<"Parse error in column " <<col+1;  // Convert 0-indexing to 1-indexing
                 rejectRecord(ss.str());
                 rejected = true;

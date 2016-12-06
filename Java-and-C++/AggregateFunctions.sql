@@ -3,7 +3,7 @@
  *
  * Example SQL for User Defined Aggregate Functions
  *
- * Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP 
+ * Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP 
  */
 
 
@@ -15,8 +15,8 @@ CREATE LIBRARY AggregateFunctions AS :libfile;
 CREATE AGGREGATE FUNCTION agg_average AS LANGUAGE 'C++'
 NAME 'AverageFactory' LIBRARY AggregateFunctions;
 
-CREATE AGGREGATE FUNCTION agg_concatenate AS LANGUAGE 'C++'
-NAME 'ConcatenateFactory' LIBRARY AggregateFunctions; 
+CREATE AGGREGATE FUNCTION agg_longest_string AS LANGUAGE 'C++'
+NAME 'LongestStringFactory' LIBRARY AggregateFunctions; 
 
 CREATE AGGREGATE FUNCTION agg_count AS LANGUAGE 'C++'
 NAME 'CountOccurencesFactory' LIBRARY AggregateFunctions;
@@ -24,7 +24,7 @@ NAME 'CountOccurencesFactory' LIBRARY AggregateFunctions;
 
 -- Step 3: Use Functions
 
--- Example table used by Average and Concatenate.
+-- Example table used by Average and Longest string aggregate UD functions.
 CREATE TABLE T (x INTEGER, y NUMERIC(5,2), z VARCHAR(10));
 COPY T FROM STDIN DELIMITER ',';
 1,1.5,'A'
@@ -37,6 +37,8 @@ COPY T FROM STDIN DELIMITER ',';
 3,3.5,'C'
 3,1.5,'B'
 3,7.5,'B'
+4,5.5,'BC'
+4,7.5,'AB'
 \.
 
 /***** Example 1: Average *****/
@@ -48,23 +50,22 @@ GROUP BY x, z
 ORDER BY x, z;
 
 
-/***** Example 2: Concatenate *****/
+/***** Example 2: LongestString *****/
 
 -- Invoke UDF
-SELECT ts.x, agg_concatenate(ts.z) as concat
-FROM (
-  SELECT x, z
-  FROM T
-  ORDER BY x, z) as ts
-GROUP BY x;
+SELECT x, agg_longest_string(z)
+FROM t
+GROUP BY x
+ORDER BY x;
+
 
 /******* Example 3: Count Occurences of a num *******/
 
-SELECT agg_count(y using parameters n=1.5) as num_occurences
+SELECT agg_count(x using parameters n=2) as num_occurences
 FROM T;
 
-SELECT x, agg_count(y using parameters n=1.5) as num_occurences
-FROM T group by x;
+SELECT z, agg_count(x using parameters n=2) as num_occurences
+FROM T GROUP BY z;
 
 -- Step 4: Cleanup
 DROP TABLE T;

@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 /*
  * Description: Example User Defined Analytic Function nth_value to output the value of the nth row.
  *
@@ -8,7 +8,6 @@
 #include <sstream>
 
 using namespace Vertica;
-using namespace std;
 
 
 /*
@@ -25,7 +24,7 @@ class NthValue : public AnalyticFunction
     {
         try {
             const SizedColumnTypes &inTypes = inputReader.getTypeMetaData();
-            vector<size_t> argCols; // Argument column indexes.
+            std::vector<size_t> argCols; // Argument column indexes.
             inTypes.getArgumentColumns(argCols);
             vint nParam = 0;
 
@@ -60,7 +59,7 @@ class NthValue : public AnalyticFunction
                     outputWriter.setNull(0);
                 } while (outputWriter.next());
             }
-        } catch(exception& e) {
+        } catch(std::exception& e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while processing partition: [%s]", e.what());
         }
@@ -80,7 +79,7 @@ class NthValueFactory : public AnalyticFunctionFactory
                                const SizedColumnTypes &inputTypes,
                                SizedColumnTypes &outputTypes)
     {
-        vector<size_t> argCols; // Argument column indexes.
+        std::vector<size_t> argCols; // Argument column indexes.
         inputTypes.getArgumentColumns(argCols);
 
         // Two arguments are expected with optional Pby and Oby clauses.

@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 /****************************
  * Vertica Analytic Database
  *
@@ -16,9 +16,6 @@ using namespace Vertica;
 #include <vector>
 
 
-using namespace std;
-
-
 // Parses a fixed list of delimiters from a string
 struct DelimiterParser
 {
@@ -27,11 +24,11 @@ struct DelimiterParser
     // Describes a field: delimiter and max length
     struct DelimDesc
     {
-        DelimDesc(const string &n, const string &delim, size_t len) : 
+        DelimDesc(const std::string &n, const std::string &delim, size_t len) : 
             _name(n), _delim(delim), _len(len) { _fieldNames.push_back(n); }
 
         // Specify that the delimiter represents several fields with the specified names
-        void setFields(const std::vector<string> &fieldNames) { _fieldNames = fieldNames; }
+        void setFields(const std::vector<std::string> &fieldNames) { _fieldNames = fieldNames; }
         
         // Get the name of the idx'th field
         const std::string& getFieldName(size_t idx) { return _fieldNames.at(idx); }
@@ -41,14 +38,14 @@ struct DelimiterParser
         const std::string& getDelimString() const { return _delim;     }        
 
     private:
-        string         _name;
-        string         _delim;
+        std::string         _name;
+        std::string         _delim;
         size_t         _len;
-        vector<string> _fieldNames; // maximum number of fields (split on space)
+        std::vector<std::string> _fieldNames; // maximum number of fields (split on space)
     };
 
     // Add a delimiter to this parser
-    DelimDesc& addDelim(const string &dname, const string &delim, size_t len = 64000) 
+    DelimDesc& addDelim(const std::string &dname, const std::string &delim, size_t len = 64000) 
     {
         _delims.push_back(DelimDesc(dname, delim, len));
         return _delims.back();
@@ -97,24 +94,24 @@ struct DelimiterParser
     iterator end()   { return iterator(this, _delims.size()); }
 
     // Gets the next field
-    string parseNext();
+    std::string parseNext();
 
     // resets for next parsing line
-    void nextLine(const string &line) { _input = line; _idx = 0; _delimIdx = 0; }
+    void nextLine(const std::string &line) { _input = line; _idx = 0; _delimIdx = 0; }
 
 private:
 
-    string            _input;
+    std::string            _input;
     size_t            _idx; // current parse location
 
-    vector<DelimDesc> _delims;
+    std::vector<DelimDesc> _delims;
     size_t            _delimIdx;
 };
 
 // Parse the next delimited field from input starting at idx. Updates idx
-string DelimiterParser::parseNext()
+std::string DelimiterParser::parseNext()
 {
-    const string &delim = getDelim(_delimIdx++).getDelimString();
+    const std::string &delim = getDelim(_delimIdx++).getDelimString();
 
     // empty delim means rest of string
     if (delim.empty()) return _input.substr(_idx);
@@ -126,9 +123,9 @@ string DelimiterParser::parseNext()
     const size_t maxIdx = _input.size();
 
     // If not found, take rest of the string
-    if (next == string::npos) next = maxIdx;
+    if (next == std::string::npos) next = maxIdx;
 
-    string ret = _input.substr(_idx, next-_idx);
+    std::string ret = _input.substr(_idx, next-_idx);
 
     // remember where we are next time
     _idx = next + delim.size();
@@ -143,7 +140,7 @@ struct ApacheDelimiterParser : public DelimiterParser
     ApacheDelimiterParser();
 
     // Parse the next line into the appropriate fields of the output writer.
-    void parseLine(const string &line, PartitionWriter &output_writer);
+    void parseLine(const std::string &line, PartitionWriter &output_writer);
 
     // Generates the appropriate line if the input was null
     void parseNullLine(PartitionWriter &output_writer);
@@ -172,7 +169,7 @@ ApacheDelimiterParser::ApacheDelimiterParser()
     // 
     // "GET /xmas_tree/113-1335_IMG.JPG HTTP/1.1"
     // "GET /xmas_tree/113-1335_IMG.JPG"
-    vector<string> fields; 
+    std::vector<std::string> fields; 
     fields.push_back("request_type"); 
     fields.push_back("request_url"); 
     fields.push_back("request_version");
@@ -183,7 +180,7 @@ ApacheDelimiterParser::ApacheDelimiterParser()
     addDelim("user_agent", "");
 }
 
-void ApacheDelimiterParser::parseLine(const string &line, 
+void ApacheDelimiterParser::parseLine(const std::string &line, 
                                       PartitionWriter &output_writer)
 {
     nextLine(line);
@@ -197,7 +194,7 @@ void ApacheDelimiterParser::parseLine(const string &line,
         if (!it.onFirstField()) continue;
 
         // Parse out the next field from the delimiter
-        string fldVal = parseNext();
+        std::string fldVal = parseNext();
 
         // Special case no value and '-' into NULLs for the DB
         if (fldVal.empty() || fldVal == "-")
@@ -214,7 +211,7 @@ void ApacheDelimiterParser::parseLine(const string &line,
                 VString &res = output_writer.getStringRef(i++);
 
                 size_t idx = fldVal.find(' ', pos);
-                if (idx == string::npos) 
+                if (idx == std::string::npos) 
                 {
                     if (pos == fldVal.size()) res.setNull(); // already at end of string
                     else                      res.copy(fldVal.substr(pos)); // take rest of string
@@ -300,7 +297,7 @@ public:
 
                 outputWriter.next();
             } while (inputReader.next());
-        } catch(exception& e) {
+        } catch(std::exception& e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while processing partition: [%s]", e.what());
         }

@@ -3,7 +3,7 @@
  *
  * Example SQL for User Defined Filter Functions
  *
- * Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP 
+ * Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP 
  */
 
 

@@ -1,5 +1,5 @@
 ****************************
-* HPE Vertica Analytics Platform
+* HP Vertica Analytics Platform
 *
 * User Defined Extensions Examples
 *

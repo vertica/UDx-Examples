@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 /* 
  * Description: Example User Defined Transform Function: Build inverted index
  *
@@ -10,7 +10,6 @@
 #include <map>
 
 using namespace Vertica;
-using namespace std;
 
 /**
  * Multiphase User Defined Transform: Inverted Index Example
@@ -70,7 +69,7 @@ class ForwardIndexBuilder : public TransformFunction
             // Sanity checks on input/output we've been given.
             // Expected input: (doc_id INTEGER, text VARCHAR)
             const SizedColumnTypes &inTypes = inputReader.getTypeMetaData();
-            vector<size_t> argCols;
+            std::vector<size_t> argCols;
             inTypes.getArgumentColumns(argCols);
 
             if (argCols.size() < 2 || !inTypes.getColumnType(argCols.at(0)).isInt() ||
@@ -78,11 +77,11 @@ class ForwardIndexBuilder : public TransformFunction
                 vt_report_error(0, "Function expects two arguments (INTEGER, VARCHAR).");
 
             const SizedColumnTypes &outTypes = outputWriter.getTypeMetaData();
-            vector<size_t> outArgCols;
+            std::vector<size_t> outArgCols;
             outTypes.getArgumentColumns(outArgCols);
-            vector<size_t> outPbyCols;
+            std::vector<size_t> outPbyCols;
             outTypes.getPartitionByColumns(outPbyCols);
-            vector<size_t> outObyCols;
+            std::vector<size_t> outObyCols;
             outTypes.getOrderByColumns(outObyCols);
 
             if (outArgCols.size() != 1 || !outTypes.getColumnType(outArgCols.at(0)).isInt() ||
@@ -95,11 +94,11 @@ class ForwardIndexBuilder : public TransformFunction
             do {
                 vint docId = inputReader.getIntRef(argCols.at(0));
                 VString text = inputReader.getStringRef(argCols.at(1));
-                map<string, int> docTerms; // term counts.
+                std::map<std::string, int> docTerms; // term counts.
 
                 if (!text.isNull()) {
                     std::string terms = text.str();
-                    istringstream iss(terms);
+                    std::istringstream iss(terms);
 
                     do {
                         std::string term;
@@ -117,7 +116,7 @@ class ForwardIndexBuilder : public TransformFunction
                     } while (iss);
 
                     // Output: (term_freq) OVER(PBY term OBY doc_id).
-                    for (map<string, int>::iterator it = docTerms.begin();
+                    for (std::map<std::string, int>::iterator it = docTerms.begin();
                          it != docTerms.end(); ++it) {
                         outputWriter.setInt(outArgCols.at(0), it->second); // term_freq
                         VString &termRef = outputWriter.getStringRef(outPbyCols.at(0)); // term
@@ -129,7 +128,7 @@ class ForwardIndexBuilder : public TransformFunction
                     docTerms.clear();
                 }
             } while (inputReader.next());
-       } catch(exception& e) {
+       } catch(std::exception& e) {
            // Standard exception. Quit.
            vt_report_error(0, "Exception while processing partition: [%s]", e.what());
        }
@@ -179,11 +178,11 @@ class InvertedIndexBuilder : public TransformFunction
            // Expected input: (term_freq INTEGER) OVER(PBY term VARCHAR OBY doc_id INTEGER)
            const SizedColumnTypes &inTypes = inputReader.getTypeMetaData();
 
-           vector<size_t> argCols;
+           std::vector<size_t> argCols;
            inTypes.getArgumentColumns(argCols);
-           vector<size_t> pByCols;
+           std::vector<size_t> pByCols;
            inTypes.getPartitionByColumns(pByCols);
-           vector<size_t> oByCols;
+           std::vector<size_t> oByCols;
            inTypes.getOrderByColumns(oByCols);
 
            if (argCols.size() != 1 || pByCols.size() != 1 || oByCols.size() != 1 ||
@@ -193,7 +192,7 @@ class InvertedIndexBuilder : public TransformFunction
                vt_report_error(0, "Function expects an argument (INTEGER) with analytic clause OVER(PBY VARCHAR OBY INTEGER)");
 
            const SizedColumnTypes &outTypes = outputWriter.getTypeMetaData();
-           vector<size_t> outArgCols;
+           std::vector<size_t> outArgCols;
            outTypes.getArgumentColumns(outArgCols);
 
            if (outArgCols.size() != 4 || 
@@ -205,7 +204,7 @@ class InvertedIndexBuilder : public TransformFunction
                                "(VARCHAR, INTEGER, INTEGER, INTEGER)");
 
            VString term = inputReader.getStringRef(pByCols.at(0));
-           ostringstream oss;
+           std::ostringstream oss;
            vint corpFreq = 0;
 
            // Count the number of documents the term appears in.
@@ -228,7 +227,7 @@ class InvertedIndexBuilder : public TransformFunction
            outputWriter.setNull(outArgCols.at(2)); // term_freq
            outputWriter.setInt(outArgCols.at(3), corpFreq); // corp_freq
            outputWriter.next();
-       } catch(exception& e) {
+       } catch(std::exception& e) {
            // Standard exception. Quit.
            vt_report_error(0, "Exception while processing partition: [%s]", e.what());
        }
@@ -250,7 +249,7 @@ public:
        {
            // Sanity checks on input we've been given.
            // Expected input: (doc_id INTEGER, text VARCHAR)
-           vector<size_t> argCols;
+           std::vector<size_t> argCols;
            inputTypes.getArgumentColumns(argCols);
 
            if (argCols.size() < 2 ||
@@ -289,11 +288,11 @@ public:
            // Sanity checks on input we've been given.
            // Expected input:
            //   (term_freq INTEGER) OVER(PBY term VARCHAR OBY doc_id INTEGER)
-           vector<size_t> argCols;
+           std::vector<size_t> argCols;
            inputTypes.getArgumentColumns(argCols);
-           vector<size_t> pByCols;
+           std::vector<size_t> pByCols;
            inputTypes.getPartitionByColumns(pByCols);
-           vector<size_t> oByCols;
+           std::vector<size_t> oByCols;
            inputTypes.getOrderByColumns(oByCols);
 
            if (argCols.size() != 1 || pByCols.size() != 1 || oByCols.size() != 1 ||

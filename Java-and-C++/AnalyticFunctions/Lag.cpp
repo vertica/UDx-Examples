@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 /* 
  * Description: Example User Defined Analytic Function Lag.
  *
@@ -8,7 +8,6 @@
 #include <sstream>
 
 using namespace Vertica;
-using namespace std;
 
 /*
  * Lag takes in an input expression and an offset value which determines how far to
@@ -24,7 +23,7 @@ class Lag : public AnalyticFunction
     {
         try {
             const SizedColumnTypes &inTypes = inputReader.getTypeMetaData();
-            vector<size_t> argCols; // Argument column indexes.
+            std::vector<size_t> argCols; // Argument column indexes.
             inTypes.getArgumentColumns(argCols);
 
             vint lagOffset = inputReader.getIntRef(argCols.at(1)); // the offset.
@@ -42,7 +41,7 @@ class Lag : public AnalyticFunction
                     outputWriter.setInt(0, vint_null);
                 }
             } while (outputWriter.next());
-        } catch(exception& e) {
+        } catch(std::exception& e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while processing partition: [%s]", e.what());
         }

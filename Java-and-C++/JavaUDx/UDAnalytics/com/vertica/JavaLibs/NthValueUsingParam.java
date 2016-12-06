@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- Java -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- Java -*-*/
 /*
  * Description: Example User Defined Analytic Function nth_value to output the value of the nth row.
  *

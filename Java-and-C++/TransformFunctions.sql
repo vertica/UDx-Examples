@@ -3,7 +3,7 @@
  *
  * Example SQL for User Defined Transform Functions
  *
- * Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP 
+ * Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP 
  */
 
 -- Step 1: Create LIBRARY 

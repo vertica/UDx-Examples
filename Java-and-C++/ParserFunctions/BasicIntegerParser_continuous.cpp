@@ -1,4 +1,4 @@
-/*Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/*Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 
 #include "Vertica.h"
 #include "ContinuousUDParser.h"
@@ -7,7 +7,6 @@ using namespace Vertica;
 
 #include <string>
 #include <sstream>
-using namespace std;
 
 /**
  * Basic Integer parser
@@ -20,9 +19,9 @@ private:
     // campaign for the conservation of keystrokes
     char *ptr(size_t pos = 0) { return ((char*)cr.getDataPtr()) + pos; }
 
-    vint strToInt(const string &str) {
+    vint strToInt(const std::string &str) {
         vint retVal;
-        stringstream ss;
+        std::stringstream ss;
         ss << str;
         ss >> retVal;
         return retVal;
@@ -42,7 +41,7 @@ public:
                 pos++;
                 reserved = cr.reserve(pos+1);
             }
-            string st(ptr(), pos);
+            std::string st(ptr(), pos);
             writer->setInt(0, strToInt(st));
             writer->next();
             while (reserved == pos+1 && !(*ptr(pos) >= '0' && *ptr(pos) <= '9')) {

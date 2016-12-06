@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 /* 
  * Description: Example User Defined Transform Function: Output top-k rows in each partition
  *
@@ -8,7 +8,6 @@
 #include <sstream>
 
 using namespace Vertica;
-using namespace std;
 
 class PolyTopKPerPartition : public TransformFunction
 {
@@ -29,7 +28,7 @@ class PolyTopKPerPartition : public TransformFunction
             vint cnt=0;
             // Sanity check the input we've been given
             const SizedColumnTypes &inTypes = inputReader.getTypeMetaData();
-            vector<size_t> argCols; // Argument column indexes.
+            std::vector<size_t> argCols; // Argument column indexes.
             inTypes.getArgumentColumns(argCols);
 
             if (argCols.size() < 1)
@@ -42,12 +41,12 @@ class PolyTopKPerPartition : public TransformFunction
               
                 // Write the arguments to output
                 size_t owColIdx = 0;
-                for (vector<size_t>::iterator i = argCols.begin(); i < argCols.end(); i++)
+                for (std::vector<size_t>::iterator i = argCols.begin(); i < argCols.end(); i++)
                     outputWriter.copyFromInput(owColIdx++, inputReader, *i);
                 outputWriter.next();
                 cnt++;
             } while (inputReader.next());
-        } catch(exception& e) {
+        } catch(std::exception& e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while processing partition: [%s]", e.what());
         }
@@ -78,10 +77,10 @@ class PolyTopKPerPartitionFactory : public TransformFunctionFactory
                                const SizedColumnTypes &inputTypes, 
                                SizedColumnTypes &outputTypes)
     {
-        vector<size_t> argCols; // Argument column indexes.
+        std::vector<size_t> argCols; // Argument column indexes.
         inputTypes.getArgumentColumns(argCols);        
 
-        for (vector<size_t>::iterator i = argCols.begin(); i < argCols.end(); i++)
+        for (std::vector<size_t>::iterator i = argCols.begin(); i < argCols.end(); i++)
         {
             outputTypes.addArg(inputTypes.getColumnType(*i), inputTypes.getColumnName(*i));
         }

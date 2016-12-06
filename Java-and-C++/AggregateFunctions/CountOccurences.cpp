@@ -1,6 +1,7 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP -*- C++ -*- */
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP -*- C++ -*- */
 /* 
- * Description: Example User Defined Aggregate Function: CountOccurences
+ * Description: Example User Defined Aggregate Function to count the number of times
+ *              a specific integer appears in the input
  *
  * Create Date: Nov 01, 2014
  */
@@ -11,63 +12,68 @@
 #include <iostream>
 
 using namespace Vertica;
-using namespace std;
 
 /**
- * User Defined Aggregate Function CountOccurences that takes in floats and count the occurences of a 
- * number specified by the parameter n
+ * User Defined Aggregate Function CountOccurences that takes in integers
+ * and counts the occurences of a number specified by the parameter n
  */
 class CountOccurences : public AggregateFunction
 {
+    vint n; // integer to look for
+
+public:
+    CountOccurences(): n(vint_null) { }
+
+    virtual void setup(ServerInterface &srvInterface,
+                       const SizedColumnTypes &argTypes) {
+        // Get the value of n from the parameters
+        ParamReader paramReader = srvInterface.getParamReader();
+        if (!paramReader.containsParameter("n")) {
+            vt_report_error(0, "You must provide a value for parameter n");
+        }
+        n = paramReader.getIntRef("n");
+    }
 
     virtual void initAggregate(ServerInterface &srvInterface, 
                                IntermediateAggs &aggs)
     {
-         //get the value of n for the parameters
-        ParamReader paramReader = srvInterface.getParamReader();
-        vfloat n = paramReader.getFloatRef("n");
-        vfloat &num = aggs.getFloatRef(0);
-        num = n;
-        vint &cnt = aggs.getIntRef(1);
-        cnt = 0;
+        vint &count = aggs.getIntRef(0);
+        count = 0;
     }
 
     void aggregate(ServerInterface &srvInterface, 
                    BlockReader &arg_reader, 
                    IntermediateAggs &aggs)
     {
-        vint &cnt = aggs.getIntRef(1);
-        vfloat &num = aggs.getFloatRef(0);
+        vint &count = aggs.getIntRef(0);
         do {
-            const vfloat &input = arg_reader.getFloatRef(0);
+            const vint &input = arg_reader.getIntRef(0);
             
-            if (num==input) {
-                cnt++;
+            if (n == input) {
+                count++;
             }
         } while (arg_reader.next());
-
     }
 
     virtual void combine(ServerInterface &srvInterface, 
                          IntermediateAggs &aggs, 
                          MultipleIntermediateAggs &aggs_other)
     {
-        vint &myCount    = aggs.getIntRef(1);
+        vint &myCount = aggs.getIntRef(0);
 
         // Combine all the other intermediate aggregates
         do {
-            const vint &otherCount = aggs_other.getIntRef(1);                        
+            const vint &otherCount = aggs_other.getIntRef(0);
             // Do the actual accumulation 
             myCount += otherCount;
         } while (aggs_other.next());
-
     }
 
     virtual void terminate(ServerInterface &srvInterface, 
                            BlockWriter &res_writer, 
                            IntermediateAggs &aggs)
     {
-        res_writer.setInt(aggs.getIntRef(1));
+        res_writer.setInt(aggs.getIntRef(0));
     }
        
     InlineAggregate()
@@ -75,7 +81,7 @@ class CountOccurences : public AggregateFunction
 
 
 /*
- * This class provides the meta-data associated with the function
+ * This class provides the metadata associated with the function
  * shown above, as well as a way of instantiating objects of the class. 
  */
 class CountOccurencesFactory : public AggregateFunctionFactory
@@ -84,7 +90,7 @@ class CountOccurencesFactory : public AggregateFunctionFactory
                               ColumnTypes &argTypes, 
                               ColumnTypes &returnType)
     {
-        argTypes.addFloat();
+        argTypes.addInt();
         returnType.addInt();
     }
 
@@ -94,24 +100,22 @@ class CountOccurencesFactory : public AggregateFunctionFactory
     {
         output_types.addInt();
     }
+
     virtual void getParameterType(ServerInterface &srvInterface,
                                   SizedColumnTypes &parameterTypes)
     {
-        parameterTypes.addFloat("n");
+        parameterTypes.addInt("n");
     }
+
     virtual void getIntermediateTypes(ServerInterface &srvInterface,
                                       const SizedColumnTypes &input_types, 
-                                      SizedColumnTypes 
-                                      &intermediateTypeMetaData)
+                                      SizedColumnTypes &intermediateTypeMetaData)
     {
-        intermediateTypeMetaData.addFloat(); // the number to be counted
-        intermediateTypeMetaData.addInt(); // count of items
+        intermediateTypeMetaData.addInt(); // intermediate count of items
     }
 
-    virtual AggregateFunction *createAggregateFunction(ServerInterface &srvfloaterface)
-    { return vt_createFuncObject<CountOccurences>(srvfloaterface.allocator); }
-
+    virtual AggregateFunction *createAggregateFunction(ServerInterface &srvInterface)
+    { return vt_createFuncObject<CountOccurences>(srvInterface.allocator); }
 };
 
 RegisterFactory(CountOccurencesFactory);
-

@@ -3,7 +3,7 @@
  *
  * Example SQL for User Defined Source Functions
  *
- * Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP 
+ * Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP 
  */
 
 
@@ -27,7 +27,7 @@ LANGUAGE 'C++' NAME 'DelimFilePortionParserFactory' LIBRARY DelimFilePortionPars
 
 create table t (n varchar(3), a varchar(4997), b varchar(4997));
 
--- sdk example delim parser with sdk file portion source, use initiator node by default (VER-33931) unless 'nodes' argument is specified
+-- sdk example delim parser with sdk file portion source, use initiator node by default unless 'nodes' argument is specified
 copy t with source FilePortionSource(file=:data) parser DelimFilePortionParser(delimiter = '|', record_terminator = '~');
 truncate table t;
 
@@ -43,18 +43,6 @@ truncate table t;
 drop table t;
 \! rm /tmp/apls_delim*.dat
 
--- Add test for VER-30866
-\set data1 '''/tmp/a.dat'''
-\! echo "1234567890123456789012345.67890" > /tmp/a.dat
-
-create table t1(m numeric(50,10));
-
---Load numeric data greater than 19 digits
-copy t1 with source FilePortionSource(file=:data1) parser DelimFilePortionParser(delimiter = '|');
-select * from t1;
-
-drop table t1;
-\! rm /tmp/a.dat
 --Cleanup Libraries
 DROP LIBRARY FilePortionSourceLib CASCADE;
 DROP LIBRARY DelimFilePortionParserLib CASCADE;

@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 
 /* 
  *
@@ -7,10 +7,10 @@
  * Create Date: Nov 01, 2014
  */
 #include "Vertica.h"
+#include <exception>
 
-class exception;
 using namespace Vertica;
-using namespace std;
+
 /*
  * This is a simple function that adds any numebr of integers and returns the result
  */
@@ -31,7 +31,7 @@ public:
         try {
             
             const SizedColumnTypes &inTypes = argReader.getTypeMetaData();
-            vector<size_t> argCols; // Argument column indexes.
+            std::vector<size_t> argCols; // Argument column indexes.
             inTypes.getArgumentColumns(argCols);
 
             // While we have inputs to process

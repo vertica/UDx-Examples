@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 
 #include "Vertica.h"
 #include "LoadArgParsers.h"
@@ -13,7 +13,7 @@ protected:
     std::string filename;
 
     virtual StreamState process(ServerInterface &srvInterface, DataBuffer &output) {
-        output.offset = fread(output.buf, 1, output.size, handle);
+        output.offset += fread(output.buf + output.offset, 1, output.size - output.offset, handle);
         return feof(handle) ? DONE : OUTPUT_NEEDED;
     }
 

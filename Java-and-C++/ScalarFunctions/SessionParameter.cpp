@@ -1,4 +1,4 @@
-/* Copyright (c) 2014- 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2014- 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 #include "Vertica.h"
 
 using namespace Vertica;

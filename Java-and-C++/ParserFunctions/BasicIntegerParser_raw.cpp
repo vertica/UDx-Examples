@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 
 #include "Vertica.h"
 #include "ContinuousUDParser.h"
@@ -7,7 +7,6 @@ using namespace Vertica;
 
 #include <string>
 #include <sstream>
-using namespace std;
 
 /**
  * Basic Integer parser
@@ -16,15 +15,15 @@ using namespace std;
  */
 class BasicIntegerParser : public UDParser {
 private:
-    vint strToInt(const string &str) {
+    vint strToInt(const std::string &str) {
         vint retVal;
-        stringstream ss;
+        std::stringstream ss;
         ss << str;
         ss >> retVal;
         return retVal;
     }
     vint strToInt(const char* start, const char* end) {
-        string str(start, end);
+        std::string str(start, end);
         return strToInt(str);
     }
 

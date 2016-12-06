@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 /* 
  * Description: Example User Defined Transform Function: Tokenize a string
  *
@@ -8,7 +8,6 @@
 #include <sstream>
 
 using namespace Vertica;
-using namespace std;
 
 
 /*
@@ -56,7 +55,7 @@ class StringTokenizer : public TransformFunction
                 {
                     // Otherwise, let's tokenize the string and output the words
                     std::string tmp = sentence.str();
-                    istringstream ss(tmp);
+                    std::istringstream ss(tmp);
 
                     do
                     {
@@ -72,7 +71,7 @@ class StringTokenizer : public TransformFunction
                     } while (ss);
                 }
             } while (inputReader.next());
-        } catch(exception& e) {
+        } catch(std::exception& e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while processing partition: [%s]", e.what());
         }

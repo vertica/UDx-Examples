@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP  -*- C++ -*-*/
 
 
 #include "Vertica.h"
@@ -12,7 +12,6 @@ using namespace Vertica;
 #include <vector>
 #include <sstream>
 #include <iostream>
-using namespace std;
 
 
 /**
@@ -26,8 +25,11 @@ using namespace std;
 template <class StringParsersImpl>
 class DelimitedParserFrameworkExample : public ContinuousUDParser {
 public:
-    DelimitedParserFrameworkExample(char delimiter = ',', char recordTerminator = '\n', std::vector<std::string> formatStrings = std::vector<std::string>())
-        : currentRecordSize(0), delimiter(delimiter), recordTerminator(recordTerminator), formatStrings(formatStrings) {}
+    DelimitedParserFrameworkExample(char delimiter = ',', char recordTerminator = '\n', std::vector<std::string> formatStrings = std::vector<std::string>(), bool enforceNotNulls = false) :
+        currentRecordSize(0),
+        delimiter(delimiter), recordTerminator(recordTerminator),
+        formatStrings(formatStrings),
+        enforceNotNulls(enforceNotNulls) {}
 
 private:
     // Keep a copy of the information about each column.
@@ -52,6 +54,11 @@ private:
 
     // Format strings
     std::vector<std::string> formatStrings;
+
+    // For rejecting data
+    bool enforceNotNulls;
+    std::string rejectReason;
+
 
     // Start off reserving this many bytes when searching for the end of a record
     // Will reserve more as needed; but from a performance perspective it's
@@ -158,7 +165,15 @@ private:
      */
     bool handleField(size_t colNum, char* start, size_t len, bool hasPadding = false) {
         // Empty colums are null.
-        if (len==0) {
+        if (len == 0) {
+            if (enforceNotNulls) {
+                const SizedColumnTypes::Properties &colProps = colInfo.getColumnProperties(colNum);
+                if (!colProps.canBeNull) {
+                    /* TODO: how to reject? */
+                    rejectReason = "NULL value for NOT NULL column";
+                    return false;
+                }
+            }
             writer->setNull(colNum);
             return true;
         } else {
@@ -229,8 +244,12 @@ public:
                 // Typically involves writing it to our StreamWriter,
                 // in which case we have to know the input column number.
                 if (!handleField(col, (char*)cr.getDataPtr() + currentColPosition, currentColSize, !cr.isEof())) {
-                    stringstream ss;
-                    ss<<"Parse error in column " <<col+1;  // Convert 0-indexing to 1-indexing
+                    std::stringstream ss;
+                    ss << "Parse error in column " << col + 1;  // Convert 0-indexing to 1-indexing
+                    if (!rejectReason.empty()) {
+                        ss << ": " << rejectReason;
+                        rejectReason.clear();
+                    }
                     rejectRecord(ss.str());
                     rejected = true;
                     break;  // Don't bother parsing this row.
@@ -345,6 +364,11 @@ public:
         else
             formatStrings.resize(returnType.getColumnCount(), "");
 
+        bool enforceNotNulls = false;
+        if (args.containsParameter("enforce_not_null_constraints")) {
+            enforceNotNulls = args.getBoolRef("enforce_not_null_constraints");
+        }
+
         for (size_t i = 0; i < returnType.getColumnCount(); i++) {
             const std::string &cname(returnType.getColumnName(i));
             if (perColumnParamReader.containsColumn(cname)) {
@@ -359,7 +383,8 @@ public:
                (srvInterface.allocator,
                 delimiter[0],
                 record_terminator[0],
-                formatStrings
+                formatStrings,
+                enforceNotNulls
             );
     }
 
@@ -377,6 +402,7 @@ public:
         parameterTypes.addVarchar(1, "delimiter");
         parameterTypes.addVarchar(1, "record_terminator");
         parameterTypes.addVarchar(256, "format");
+        parameterTypes.addBool("enforce_not_null_constraints");
     }
 };
 

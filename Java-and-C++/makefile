@@ -6,7 +6,7 @@
 # To run under valgrind:
 #   make RUN_VALGRIND=1 run
 #
-# Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP 
+# Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP 
 ############################
 
 ## Set to the location of the SDK installation

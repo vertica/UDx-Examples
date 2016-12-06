@@ -1,4 +1,4 @@
-/* Copyright (c) 2005 - 2015 Hewlett Packard Enterprise Development LP -*- C++ -*- */
+/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP -*- C++ -*- */
 /* 
  * Description: Example User Defined Aggregate Function: Average
  *
@@ -10,8 +10,6 @@
 #include <iostream>
 
 using namespace Vertica;
-using namespace std;
-
 
 
 /****
@@ -27,9 +25,9 @@ class Average : public AggregateFunction
             VNumeric &sum = aggs.getNumericRef(0);
             sum.setZero();
 
-            vint &cnt = aggs.getIntRef(1);
-            cnt = 0;
-        } catch(exception& e) {
+            vint &count = aggs.getIntRef(1);
+            count = 0;
+        } catch(std::exception &e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while initializing intermediate aggregates: [%s]", e.what());
         }
@@ -41,16 +39,16 @@ class Average : public AggregateFunction
     {
         try {
             VNumeric &sum = aggs.getNumericRef(0);
-            vint     &cnt = aggs.getIntRef(1);
+            vint     &count = aggs.getIntRef(1);
 
             do {
                 const VNumeric &input = argReader.getNumericRef(0);
                 if (!input.isNull()) {
                     sum.accumulate(&input);
-                    cnt++;
+                    count++;
                 }
             } while (argReader.next());
-        } catch(exception& e) {
+        } catch(std::exception &e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while processing aggregate: [%s]", e.what());
         }
@@ -74,7 +72,7 @@ class Average : public AggregateFunction
                 myCount += otherCount;
 
             } while (aggsOther.next());
-        } catch(exception& e) {
+        } catch(std::exception &e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while combining intermediate aggregates: [%s]", e.what());
         }
@@ -85,22 +83,25 @@ class Average : public AggregateFunction
                            IntermediateAggs &aggs)
     {
         try {
-            // Metadata about the type (to allow creation)
-            const VerticaType  &numtype = aggs.getTypeMetaData().getColumnType(0);
-            const VNumeric     &sum     = aggs.getNumericRef(0);
 
             // Get the count as a numeric by making a local numeric
-            //uint64 tmp[sum.getMaxSize() / sizeof(uint64)];
-            uint64* tmp = (uint64*)malloc(numtype.getMaxSize() / sizeof(uint64));
-            VNumeric cnt(tmp, numtype.getNumericPrecision(), numtype.getNumericScale());
-            cnt.copy(aggs.getIntRef(1)); // convert to numeric!
+            // The largest int has about 20 digits. GO with that precision
+            const int32 MAX_INT_PRECISION = 20;
+            const int32 prec = Basics::getNumericWordCount(MAX_INT_PRECISION);
+            uint64 words[prec];
+            VNumeric count(words, prec, 0 /*scale*/);
+            count.copy(aggs.getIntRef(1)); // convert to numeric!
 
             VNumeric &out = resWriter.getNumericRef();
-            if (cnt.isZero())
-                out.setZero();
-            else
-                out.div(&sum, &cnt);
-        } catch(exception& e) {
+            if (count.isZero()) {
+                // Input column had no rows. Return NULL
+                out.setNull();
+            } else {
+                // Compute actual average
+                const VNumeric &sum = aggs.getNumericRef(0);
+                out.div(&sum, &count);
+            }
+        } catch(std::exception &e) {
             // Standard exception. Quit.
             vt_report_error(0, "Exception while computing aggregate output: [%s]", e.what());
         }
@@ -130,25 +131,29 @@ class AverageFactory : public AggregateFunctionFactory
                                const SizedColumnTypes &inputTypes, 
                                SizedColumnTypes &outputTypes)
     {
-        int int_part = inputTypes.getColumnType(0).getNumericPrecision();
-        int frac_part = inputTypes.getColumnType(0).getNumericScale();
-        outputTypes.addNumeric(int_part+frac_part, frac_part);
+        const VerticaType &inType = inputTypes.getColumnType(0);
+        outputTypes.addNumeric(inType.getNumericPrecision(), inType.getNumericScale());
     }
 
     virtual void getIntermediateTypes(ServerInterface &srvInterface,
                                       const SizedColumnTypes &inputTypes, 
-                                      SizedColumnTypes 
-                                      &intermediateTypeMetaData)
+                                      SizedColumnTypes &intermediateTypeMetaData)
     {
-        int int_part = inputTypes.getColumnType(0).getNumericIntegral();
-        int frac_part = inputTypes.getColumnType(0).getNumericFractional();
-        intermediateTypeMetaData.addNumeric(int_part+frac_part, frac_part); // intermediate sum
+        const VerticaType &inType = inputTypes.getColumnType(0);
+
+        // intermediate sum
+        int32 interPrec = inType.getNumericPrecision() + 3; // provision 1000x precision if possible
+        const int32 MAX_NUMERIC_PREC = 1024;
+        if (interPrec > MAX_NUMERIC_PREC) {
+            interPrec = MAX_NUMERIC_PREC;
+        }
+        intermediateTypeMetaData.addNumeric(interPrec, inType.getNumericScale());
         intermediateTypeMetaData.addInt(); // count of items
     }
 
     // Create an instance of the AggregateFunction
-    virtual AggregateFunction *createAggregateFunction(ServerInterface &srvfloaterface)
-    { return vt_createFuncObject<Average>(srvfloaterface.allocator); }
+    virtual AggregateFunction *createAggregateFunction(ServerInterface &srvInterface)
+    { return vt_createFuncObject<Average>(srvInterface.allocator); }
 
 };
 
