@@ -182,7 +182,8 @@ public:
         this->srvInterface = NULL;
     }
 
-    // Wrap UDParser::destroy(); we have some tear-down of our own to do
+    using UDFilter::destroy;
+    // Wrap UDFilter::destroy(); we have some tear-down of our own to do
     void destroy(Vertica::ServerInterface &srvInterface) {
         this->srvInterface = &srvInterface;
         deinitialize(srvInterface);

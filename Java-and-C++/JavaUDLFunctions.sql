@@ -19,7 +19,7 @@ create source File as LANGUAGE 'JAVA' name 'com.vertica.JavaLibs.FileSourceFacto
 
 create parser BasicIntegerParser as LANGUAGE 'java'  name 'com.vertica.JavaLibs.BasicIntegerParserFactory' library JavaLib;
 
-create parser BasicIntegerParserContinuous as LANGUAGE 'JAVA' NAME 'com.vertica.JavaLibs.BasicIntegerParserFactoryContinuous' library JavaLib;
+create parser ContinuousIntegerParser as LANGUAGE 'JAVA' NAME 'com.vertica.JavaLibs.ContinuousIntegerParserFactory' library JavaLib;
 
 create filter OneTwoDecoder as LANGUAGE 'JAVA'  name 'com.vertica.JavaLibs.OneTwoDecoderFactory' library JavaLib;
 
@@ -73,7 +73,7 @@ truncate table t;
 -- Make a big data file
 \! python -c 'for i in xrange(10000000): print i' > '/tmp/continuousudparser/big.dat'
 
-copy t from '/tmp/continuousudparser/big.dat' with parser BasicIntegerParserContinuous();
+copy t from '/tmp/continuousudparser/big.dat' with parser ContinuousIntegerParser();
 
 select count(*), count(distinct i), avg(i) from t;
 

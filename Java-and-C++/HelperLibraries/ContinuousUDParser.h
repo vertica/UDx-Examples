@@ -226,6 +226,7 @@ public:
         cr.resetStreamState(); // reset internal state upon setup, as this instance might get re-used;
     }
 
+    using UDParser::destroy;
     // Wrap UDParser::destroy(); we have some tear-down of our own to do
     void destroy(Vertica::ServerInterface &srvInterface,
             Vertica::SizedColumnTypes &returnType) {

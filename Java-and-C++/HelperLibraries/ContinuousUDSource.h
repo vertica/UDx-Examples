@@ -23,7 +23,6 @@
  * repeatedly to get more data.
  */
 class ContinuousUDSource : public Vertica::UDSource {
-using Vertica::UDSource::destroy;
 public:
     // Functions to implement
 
@@ -184,9 +183,9 @@ public:
         this->srvInterface = NULL;
     }
 
-    // Wrap UDParser::destroy(); we have some tear-down of our own to do
+    using Vertica::UDSource::destroy;
+    // Wrap UDSource::destroy(); we have some tear-down of our own to do
     void destroy(Vertica::ServerInterface &srvInterface) {
-
         this->srvInterface = &srvInterface;
         // If run() hasn't finished, it is currently suspended.  To ensure
         //    that everything allocated on its stack is freed (including any
@@ -205,7 +204,7 @@ public:
         
         // If the run() method didn't return after we threw the exception, 
         //   shut down the UDx with a failed assertion
-	VIAssert(state == FINISHED || state == ABORTED);
+        VIAssert(state == FINISHED || state == ABORTED);
         deinitialize(srvInterface);
         this->srvInterface = NULL;
         state = CLOSED;

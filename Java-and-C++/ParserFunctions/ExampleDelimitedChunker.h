@@ -17,20 +17,17 @@ class ExampleDelimitedUDChunker : public UDChunker
 private:
     // Configurable parsing parameters
     // Set by the constructor
-    char recordTerminator;
+    const char recordTerminator;
 
-    // Format strings
-    std::vector<std::string> formatStrings;
-
-    // Start off reserving this many bytes when searching for the end of a record
-    // Will reserve more as needed; but from a performance perspective it's
-    // nice to not have to do so.
-    static const size_t BASE_RESERVE_SIZE = 256;
+    // Apportioned load state
+    bool pastPortion;
 
 public:
-    ExampleDelimitedUDChunker(char delimiter = ',',
-                              char recordTerminator = '\n',
-                              std::vector<std::string> formatStrings = std::vector<std::string>());
+    ExampleDelimitedUDChunker(char recordTerminator = '\n');
+
+    void setup(ServerInterface &srvInterface, SizedColumnTypes &colTypes);
+
+    StreamState alignPortion(ServerInterface &srvInterface, DataBuffer &input, InputState state);
 
     StreamState process(ServerInterface &srvInterface,
                         DataBuffer &input,

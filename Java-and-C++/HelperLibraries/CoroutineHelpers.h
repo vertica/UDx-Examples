@@ -197,7 +197,7 @@ public:
      * to tell when to go get more data, etc.
      */
     ContinuousStreamer(Coroutine &c)
-        : currentBuffer(NULL), state(NULL),
+        : bytesConsumed(0), currentBuffer(NULL), state(NULL),
           needInput(false), lastReservationSize(0), stream_state(PORTION_ALIGNED), prev_reserved(0), c(c) {}
 
     /**
@@ -308,6 +308,7 @@ public:
             if (*state == Vertica::END_OF_PORTION && (stream_state == PORTION_START || stream_state == PORTION_ALIGNED) ) {
                 // if this is all we have in this portion and reserve() didn't get to set EndOfPortion(), do it here, otherwise we'd forever lose that info after switching context for more data
                 stream_state = PORTION_END;
+                bytesConsumed += distance - remaining_distance;
                 return distance - remaining_distance; // TODO: does seek ever use return value??
             }
             c.switchBack();
@@ -361,7 +362,13 @@ public:
 
     // re-set stream_state to default (same as in c'tor)
     void resetStreamState() {
+        bytesConsumed = 0;
+        currentBuffer = NULL;
+        state = NULL;
+        needInput = false;
+        lastReservationSize = 0;
         stream_state = PORTION_ALIGNED;
+        prev_reserved = 0;
     }
 
     /// @cond INTERNAL

@@ -11,8 +11,8 @@
 \set basicintegerparser_libfile '\''`pwd`'/build/BasicIntegerParser.so\'';
 CREATE LIBRARY BasicIntegerParserLib AS :basicintegerparser_libfile;
 
-\set basicintegerparser_continuous_libfile '\''`pwd`'/build/BasicIntegerParser_continuous.so\'';
-CREATE LIBRARY BasicIntegerParserLib_Continuous AS :basicintegerparser_continuous_libfile;
+\set continuousintegerparser_libfile '\''`pwd`'/build/ContinuousIntegerParser.so\'';
+CREATE LIBRARY ContinuousIntegerParserLib AS :continuousintegerparser_libfile;
 
 \set ExampleDelimitedParser_libfile '\''`pwd`'/build/ExampleDelimitedParser.so\'';
 CREATE LIBRARY ExampleDelimitedParserLib AS :ExampleDelimitedParser_libfile;
@@ -27,11 +27,11 @@ CREATE LIBRARY TraditionalCsvParserLib AS :csv_libfile;
 CREATE PARSER BasicIntegerParser AS 
 LANGUAGE 'C++' NAME 'BasicIntegerParserFactory' LIBRARY BasicIntegerParserLib;
 
-CREATE PARSER BasicIntegerParser_Continuous AS 
-LANGUAGE 'C++' NAME 'BasicIntegerParserFactory' LIBRARY BasicIntegerParserLib_Continuous;
+CREATE PARSER ContinuousIntegerParser AS 
+LANGUAGE 'C++' NAME 'ContinuousIntegerParserFactory' LIBRARY ContinuousIntegerParserLib;
 
 CREATE PARSER ExampleDelimitedParser AS 
-LANGUAGE 'C++' NAME 'DelimitedParserFrameworkExampleFactory' LIBRARY ExampleDelimitedParserLib;
+LANGUAGE 'C++' NAME 'DelimitedParserExampleFactory' LIBRARY ExampleDelimitedParserLib;
 
 CREATE PARSER LibCSVParser AS 
 LANGUAGE 'C++' NAME 'LibCSVParserFactory' LIBRARY Rfc4180CsvParserLib;
@@ -57,7 +57,7 @@ copy t from stdin with parser BasicIntegerParser();
 select * from t order by i;
 truncate table t;
 
-copy t from stdin with parser BasicIntegerParser_Continuous();
+copy t from stdin with parser ContinuousIntegerParser();
 0
 1
 2
@@ -129,11 +129,7 @@ DROP TABLE ext_t;
 \! rm -f /tmp/vertica_udparser_external_table_example.txt
 
 DROP LIBRARY BasicIntegerParserLib CASCADE;
-DROP LIBRARY BasicIntegerParserLib_Continuous CASCADE;
+DROP LIBRARY ContinuousIntegerParserLib CASCADE;
 DROP LIBRARY ExampleDelimitedParserLib CASCADE;
 DROP LIBRARY Rfc4180CsvParserLib CASCADE;
 DROP LIBRARY TraditionalCsvParserLib CASCADE;
-
-
-
-

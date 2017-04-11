@@ -1,5 +1,5 @@
 ****************************
-* HP Vertica Analytics Platform
+* HPE Vertica Analytics Platform
 *
 * User Defined Extensions Examples
 *
@@ -15,7 +15,7 @@ User Defined Aggregates (UDAgg), and User Defined Load (UDL).
 
 3. UDx in Java: Scalar Functions (UDF) and User Defined Transforms (UDT)
 
-Note: HP Vertica R language package should be installed before running the R example functions below.
+Note: HPE Vertica R language package should be installed before running the R example functions below.
 Please refer to the "Installing R for Vertica" section in the documentation for R package installation instructions.
 Note: The functions included herein are code examples, intended for developers.
 Vertica supports the Vertica SDK API, but does not support code compiled by other developers against the API.

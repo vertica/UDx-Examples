@@ -22,8 +22,8 @@ import com.vertica.sdk.UDSource;
 import com.vertica.sdk.UdfException;
 
 public class FilePortionSourceFactory extends SourceFactory {
-	@Override
-	public void plan(ServerInterface srvInterface,
+    @Override
+    public void plan(ServerInterface srvInterface,
             NodeSpecifyingPlanContext planCtxt) throws UdfException {
         if (!srvInterface.getParamReader().containsParameter("file")) {
             throw new UdfException(0, "Required parameter \"file\" not found");
@@ -32,17 +32,17 @@ public class FilePortionSourceFactory extends SourceFactory {
         if (srvInterface.getParamReader().containsParameter("offsets")
                 && !planCtxt.canApportionSource()) {
             throw new UdfException(0, "\"offsets\" parameter provided but source cannot be apportioned");
-        }
+                }
 
-		findExecutionNodes(srvInterface.getParamReader(), planCtxt, srvInterface.getCurrentNodeName());
+        findExecutionNodes(srvInterface.getParamReader(), planCtxt, srvInterface.getCurrentNodeName());
     }
-	
-	@Override
-	public void getParameterType(ServerInterface srvInterface, SizedColumnTypes parameterTypes) {
-		parameterTypes.addVarchar(65000, "file");
-		parameterTypes.addVarchar(65000, "nodes");
+
+    @Override
+    public void getParameterType(ServerInterface srvInterface, SizedColumnTypes parameterTypes) {
+        parameterTypes.addVarchar(65000, "file");
+        parameterTypes.addVarchar(65000, "nodes");
         parameterTypes.addVarchar(65000, "offsets");
-	}
+    }
 
     @Override
     public boolean isSourceApportionable() {
@@ -51,8 +51,8 @@ public class FilePortionSourceFactory extends SourceFactory {
 
     @Override
     public int getDesiredThreads(ServerInterface srvInterface, ExecutorPlanContext planCtxt) throws UdfException {
-		//TODO
-		// Do glob expansion; if the path contains '*', find all matching files.
+        //TODO
+        // Do glob expansion; if the path contains '*', find all matching files.
         // Note that this has to be done in the prepare() method:
         // plan() runs on the initiator node, which may be a totally different
         // computer from the execution node that runs the actual query.
@@ -63,7 +63,7 @@ public class FilePortionSourceFactory extends SourceFactory {
         // prepare(), on the other hand, runs on the execution node.  So it's
         // fine to access local files and resources.
         // no apportioning unless the "offsets" parameter is provided
-    
+
         if (!srvInterface.getParamReader().containsParameter("offsets")) {
             // only one file
             return 1;
@@ -97,7 +97,7 @@ public class FilePortionSourceFactory extends SourceFactory {
                 long size = (i == offsets.length - 1) ? (fileSize - start) : (offsets[i + 1] - start);
 
                 myPortions.add(new Portion(start, size, i == 0));
-            }
+                    }
         }
 
         // save our portions for later so we don't have to re-compute them
@@ -106,11 +106,11 @@ public class FilePortionSourceFactory extends SourceFactory {
         return myPortions.size();
     }
 
-	@Override
-	public ArrayList<UDSource> prepareUDSources(ServerInterface srvInterface,
-			ExecutorPlanContext planCtxt) throws UdfException {
-		ArrayList<UDSource> sources = new ArrayList<UDSource>();
-		String filename = srvInterface.getParamReader().getString("file");
+    @Override
+    public ArrayList<UDSource> prepareUDSources(ServerInterface srvInterface,
+            ExecutorPlanContext planCtxt) throws UdfException {
+        ArrayList<UDSource> sources = new ArrayList<UDSource>();
+        String filename = srvInterface.getParamReader().getString("file");
 
         if (planCtxt.getReader().containsParameter("myPortions")) {
             List<Portion> myPortions = planCtxt.getWriter().<List<Portion>> getObject("myPortions");
@@ -121,25 +121,25 @@ public class FilePortionSourceFactory extends SourceFactory {
             // just one source: the whole file
             sources.add(new FileSource(filename));
         }
-		
-		return sources;
-	}
-	
-	private void findExecutionNodes(ParamReader args,
-            NodeSpecifyingPlanContext planCtxt, String defaultList) throws UdfException {
-	    String nodes;
-	    ArrayList<String> clusterNodes = new ArrayList<String>(planCtxt.getClusterNodes());
-	    ArrayList<String> executionNodes = new ArrayList<String>();
 
-	    // If we found the nodes arg,
-	    if (args.containsParameter("nodes")) {
-	        nodes = args.getString("nodes");
-	    } else if (defaultList != "" ) {
-	        nodes = defaultList;
-	    } else {
-	        // We have nothing to do here.
-	        return;
-	    }
+        return sources;
+    }
+
+    private void findExecutionNodes(ParamReader args,
+            NodeSpecifyingPlanContext planCtxt, String defaultList) throws UdfException {
+        String nodes;
+        ArrayList<String> clusterNodes = new ArrayList<String>(planCtxt.getClusterNodes());
+        ArrayList<String> executionNodes = new ArrayList<String>();
+
+        // If we found the nodes arg,
+        if (args.containsParameter("nodes")) {
+            nodes = args.getString("nodes");
+        } else if (defaultList != "" ) {
+            nodes = defaultList;
+        } else {
+            // We have nothing to do here.
+            return;
+        }
 
         // Check for "offsets" parameter which would limit the number of nodes
         int nodeLimit = -1;
@@ -152,40 +152,40 @@ public class FilePortionSourceFactory extends SourceFactory {
             }
         }
 
-	    // Check for special magic values first
-	    if (nodes == "ALL NODES") {
+        // Check for special magic values first
+        if (nodes == "ALL NODES") {
             if (nodeLimit < 0) {
                 executionNodes = clusterNodes;
             } else {
                 executionNodes = new ArrayList<String>(clusterNodes.subList(0, nodeLimit));
             }
-	    } else if (nodes == "ANY NODE") {
+        } else if (nodes == "ANY NODE") {
             Collections.shuffle(clusterNodes);
             if (nodeLimit < 0) {
                 executionNodes.add(clusterNodes.get(0));
             } else {
                 executionNodes = new ArrayList<String>(clusterNodes.subList(0, nodeLimit));
             }
-	    } else if (nodes == "") {
-	        // Return the empty nodes list.
-	        // Vertica will deal with this case properly.
-	    } else {
-	        // Have to actually parse the string	      
-	        // "nodes" is a comma-separated list of node names.
-	    	String[] nodeNames = nodes.split(",");
-	    	
-            nodeLimit = nodeLimit < 0 ? clusterNodes.size() : nodeLimit;
-	        for (int i = 0; i < nodeNames.length; i++){
-	        	if (clusterNodes.contains(nodeNames[i]) && executionNodes.size() < nodeLimit) {
-	        		executionNodes.add(nodeNames[i]);
-                } else {
-	            	String msg = String.format("Specified node '%s' but no node by that name is available.  Available nodes are \"%s\".",
-	                        nodeNames[i], clusterNodes.toString());
-	            	throw new UdfException(0, msg);
-	            }
-	        }
-	    }
+        } else if (nodes == "") {
+            // Return the empty nodes list.
+            // Vertica will deal with this case properly.
+        } else {
+            // Have to actually parse the string	      
+            // "nodes" is a comma-separated list of node names.
+            String[] nodeNames = nodes.split(",");
 
-	    planCtxt.setTargetNodes(executionNodes);
-	}
+            nodeLimit = nodeLimit < 0 ? clusterNodes.size() : nodeLimit;
+            for (int i = 0; i < nodeNames.length; i++){
+                if (clusterNodes.contains(nodeNames[i]) && executionNodes.size() < nodeLimit) {
+                    executionNodes.add(nodeNames[i]);
+                } else {
+                    String msg = String.format("Specified node '%s' but no node by that name is available.  Available nodes are \"%s\".",
+                            nodeNames[i], clusterNodes.toString());
+                    throw new UdfException(0, msg);
+                }
+            }
+        }
+
+        planCtxt.setTargetNodes(executionNodes);
+    }
 }

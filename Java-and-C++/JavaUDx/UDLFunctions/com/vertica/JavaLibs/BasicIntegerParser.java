@@ -1,4 +1,5 @@
-/* Copyright (c) 2005 - 2016 Hewlett Packard Enterprise Development LP -*- Java -*-
+/* 
+ * Copyright (c) 2005 - 2017 Hewlett Packard Enterprise Development LP -*- Java -*-
  *
  * Create Date: September 10, 2013
  */
@@ -13,11 +14,9 @@ import com.vertica.sdk.UDParser;
 import com.vertica.sdk.UdfException;
 
 public class BasicIntegerParser extends UDParser {
-
-	
-	@Override
-	public StreamState process(ServerInterface srvInterface, DataBuffer input,
-			InputState input_state) throws UdfException, DestroyInvocation {
+    @Override
+    public StreamState process(ServerInterface srvInterface, DataBuffer input,
+            InputState input_state) throws UdfException, DestroyInvocation {
 
         int start = input.offset;
         final int end = input.buf.length;
@@ -58,5 +57,5 @@ public class BasicIntegerParser extends UDParser {
 
             start = numEnd + 1;
         } while (true);
-	}
+    }
 }

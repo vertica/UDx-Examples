@@ -111,10 +111,11 @@ UserDefinedLoad: $(BUILD_DIR)/IconverterLib.so \
 				 $(BUILD_DIR)/SearchAndReplaceFilter.so \
 				 $(BUILD_DIR)/filelib.so \
 				 $(BUILD_DIR)/BasicIntegerParser.so \
-				 $(BUILD_DIR)/BasicIntegerParser_continuous.so \
+				 $(BUILD_DIR)/ContinuousIntegerParser.so \
 				 $(BUILD_DIR)/ExampleDelimitedParser.so \
 				 $(BUILD_DIR)/FilePortionSource.so \
 				 $(BUILD_DIR)/DelimFilePortionParser.so \
+				 $(BUILD_DIR)/NativeIntegerParser.so \
 				 $(BUILD_DIR)/TraditionalCsvParser.so \
 				 $(BUILD_DIR)/Rfc4180CsvParser.so \
 				 $(BUILD_DIR)/NoOpSource.so
@@ -180,13 +181,13 @@ $(BUILD_DIR)/SearchAndReplaceFilter.so: FilterFunctions/SearchAndReplaceFilter.c
 $(BUILD_DIR)/filelib.so: SourceFunctions/filelib.cpp $(SDK_HOME)/include/Vertica.cpp  $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
 	$(CXX) $(CXXFLAGS) -o $@ SourceFunctions/filelib.cpp $(SDK_HOME)/include/Vertica.cpp
 
-$(BUILD_DIR)/BasicIntegerParser.so: ParserFunctions/BasicIntegerParser_raw.cpp $(SDK_HOME)/include/Vertica.cpp  $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
-	$(CXX) $(CXXFLAGS) -o $@ ParserFunctions/BasicIntegerParser_raw.cpp $(SDK_HOME)/include/Vertica.cpp
+$(BUILD_DIR)/BasicIntegerParser.so: ParserFunctions/BasicIntegerParser.cpp $(SDK_HOME)/include/Vertica.cpp  $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
+	$(CXX) $(CXXFLAGS) -o $@ ParserFunctions/BasicIntegerParser.cpp $(SDK_HOME)/include/Vertica.cpp
 
-$(BUILD_DIR)/BasicIntegerParser_continuous.so: ParserFunctions/BasicIntegerParser_continuous.cpp $(SDK_HOME)/include/Vertica.cpp  $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
-	$(CXX) $(CXXFLAGS) -o $@ ParserFunctions/BasicIntegerParser_continuous.cpp $(SDK_HOME)/include/Vertica.cpp
+$(BUILD_DIR)/ContinuousIntegerParser.so: ParserFunctions/ContinuousIntegerParser.cpp $(SDK_HOME)/include/Vertica.cpp  $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
+	$(CXX) $(CXXFLAGS) -o $@ ParserFunctions/ContinuousIntegerParser.cpp $(SDK_HOME)/include/Vertica.cpp
 
-$(BUILD_DIR)/ExampleDelimitedParser.so: ParserFunctions/ExampleDelimitedParser.cpp $(SDK_HOME)/include/Vertica.cpp  $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
+$(BUILD_DIR)/ExampleDelimitedParser.so: ParserFunctions/ExampleDelimitedParser.cpp ParserFunctions/ExampleDelimitedChunker.cpp $(SDK_HOME)/include/Vertica.cpp  $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
 	$(CXX) $(CXXFLAGS) -o $@ ParserFunctions/ExampleDelimitedChunker.cpp ParserFunctions/ExampleDelimitedParser.cpp $(SDK_HOME)/include/Vertica.cpp
 
 $(BUILD_DIR)/FilePortionSource.so: ApportionLoadFunctions/FilePortionSource.cpp $(SDK_HOME)/include/Vertica.cpp  SourceFunctions/filelib.cpp $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
@@ -194,6 +195,9 @@ $(BUILD_DIR)/FilePortionSource.so: ApportionLoadFunctions/FilePortionSource.cpp 
 
 $(BUILD_DIR)/DelimFilePortionParser.so: ApportionLoadFunctions/DelimFilePortionParser.cpp $(SDK_HOME)/include/Vertica.cpp  $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
 	$(CXX) $(CXXFLAGS) -o $@ ApportionLoadFunctions/DelimFilePortionParser.cpp $(SDK_HOME)/include/Vertica.cpp
+
+$(BUILD_DIR)/NativeIntegerParser.so: ApportionLoadFunctions/NativeIntegerParser.cpp $(SDK_HOME)/include/Vertica.cpp $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists
+	$(CXX) $(CXXFLAGS) -o $@ ApportionLoadFunctions/NativeIntegerParser.cpp $(SDK_HOME)/include/Vertica.cpp
 
 # Depends boost headers but not libs
 $(BUILD_DIR)/TraditionalCsvParser.so: ParserFunctions/TraditionalCsvParser.cpp $(SDK_HOME)/include/Vertica.cpp $(SDK_HOME)/include/BuildInfo.h $(BUILD_DIR)/.exists

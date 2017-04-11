@@ -13,7 +13,7 @@ see the following links:
 * [Developing with the C++ SDK]
 * [Developing with the Java SDK]
 * [Developing with the Python SDK]
-* [Developing UDSFs and UDTFs in R]
+* [Developing with the R SDK]
 
 ### Types of Vertica User-Defined Extensions (UDxs)
 For a detailed explaination of the different types of UDxs you can build
@@ -30,13 +30,14 @@ links:
 * [C++ SDK Documentation]
 * [Java SDK Documentation]
 * [Python SDK Documentation]
+* [R SDK Documentation]
 
 
 [Vertica documentation]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/ExtendingVertica.htm
 [Developing with the C++ SDK]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/C++/DevelopingInC++.htm
 [Developing with the Java SDK]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/Java/DevelopingInJava.htm
 [Developing with the Python SDK]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/Python/DevelopingInPython.htm
-[Developing UDSFs and UDTFs in R]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/UDx/UDxR/DevelopingAUserDefinedFunctionInR.htm
+[Developing with the R SDK]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/R/DevelopingWithTheRSDK.htm
 [Aggregate Functions (UDAFs)]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/UDx/AggregateFunctions/AggregateFunctions.htm
 [Analytics Functions (UDAnFs)]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/UDx/AnalyticFunctions/AnalyticFunctions.htm
 [Scalar Functions (UDSFs)]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/UDx/ScalarFunctions/ScalarFunctions.htm
@@ -45,3 +46,4 @@ links:
 [C++ SDK Documentation]: https://my.vertica.com/docs/latest/HTML/Content/CppSDK/annotated.htm
 [Java SDK Documentation]: https://my.vertica.com/docs/latest/HTML/Content/JavaSDK/annotated.htm
 [Python SDK Documentation]: https://my.vertica.com/docs/latest/HTML/Content/PythonSDK/sdk_documentation.html
+[R SDK Documentation]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/R-SDK/OverviewRSDK.htm
