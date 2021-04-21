@@ -43,7 +43,7 @@ links:
 [Scalar Functions (UDSFs)]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/UDx/ScalarFunctions/ScalarFunctions.htm
 [Transform Functions (UDTFs)]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/UDx/TransformFunctions/TransformFunctions.htm
 [User-Defined Load Functions (UDLs)]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/ExtendingVertica/UDx/UDL/UserDefinedLoad.htm
-[C++ SDK Documentation]: https://my.vertica.com/docs/latest/HTML/Content/CppSDK/annotated.htm
-[Java SDK Documentation]: https://my.vertica.com/docs/latest/HTML/Content/JavaSDK/annotated.htm
-[Python SDK Documentation]: https://my.vertica.com/docs/latest/HTML/Content/PythonSDK/sdk_documentation.html
+[C++ SDK Documentation]: https://my.vertica.com/docs/latest/HTML/CppSDK/annotated.htm
+[Java SDK Documentation]: https://my.vertica.com/docs/latest/HTML/JavaSDK/annotated.htm
+[Python SDK Documentation]: https://my.vertica.com/docs/latest/HTML/PythonSDK/sdk_documentation.html
 [R SDK Documentation]: https://my.vertica.com/docs/latest/HTML/index.htm#Authoring/R-SDK/OverviewRSDK.htm
